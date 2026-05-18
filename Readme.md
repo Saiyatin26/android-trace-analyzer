@@ -459,7 +459,7 @@ Possible future improvements:
 
 * No external AI APIs are currently used.
 
-* Future versions may integrate:
+# Future versions may integrate:
 
 * OpenAI GPT
 * Gemini
