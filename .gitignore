@@ -1,0 +1,7 @@
+venv/
+__pycache__/
+events.db
+*.pyc
+*.perfetto-trace
+node_modules/
+dist/
