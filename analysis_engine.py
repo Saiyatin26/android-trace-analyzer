@@ -9,9 +9,9 @@ DB_NAME = "events.db"
 def analyze_cpu_load():
 
     conn = sqlite3.connect(DB_NAME)
+
     cursor = conn.cursor()
 
-    # Total CPU scheduling events
     cursor.execute("""
     SELECT COUNT(*)
     FROM events
@@ -20,7 +20,6 @@ def analyze_cpu_load():
 
     total_events = cursor.fetchone()[0]
 
-    # Average CPU execution duration
     cursor.execute("""
     SELECT AVG(duration_ms)
     FROM events
@@ -29,7 +28,6 @@ def analyze_cpu_load():
 
     avg_duration = cursor.fetchone()[0]
 
-    # Top CPU-consuming threads
     cursor.execute("""
     SELECT
         thread_id,
@@ -46,8 +44,11 @@ def analyze_cpu_load():
     conn.close()
 
     return {
+
         "total_cpu_events": total_events,
+
         "average_duration_ms": avg_duration,
+
         "top_threads": top_threads
     }
 
@@ -59,9 +60,9 @@ def analyze_cpu_load():
 def analyze_binder_calls():
 
     conn = sqlite3.connect(DB_NAME)
+
     cursor = conn.cursor()
 
-    # Total Binder calls
     cursor.execute("""
     SELECT COUNT(*)
     FROM events
@@ -70,7 +71,6 @@ def analyze_binder_calls():
 
     total_calls = cursor.fetchone()[0]
 
-    # Average Binder latency
     cursor.execute("""
     SELECT AVG(duration_ms)
     FROM events
@@ -79,7 +79,6 @@ def analyze_binder_calls():
 
     avg_latency = cursor.fetchone()[0]
 
-    # Top 10 slowest Binder paths
     cursor.execute("""
     SELECT
         binder_name,
@@ -96,8 +95,11 @@ def analyze_binder_calls():
     conn.close()
 
     return {
+
         "total_binder_calls": total_calls,
+
         "average_latency_ms": avg_latency,
+
         "slow_binder_paths": slow_paths
     }
 
@@ -109,9 +111,9 @@ def analyze_binder_calls():
 def analyze_frame_jank():
 
     conn = sqlite3.connect(DB_NAME)
+
     cursor = conn.cursor()
 
-    # Total frame events
     cursor.execute("""
     SELECT COUNT(*)
     FROM events
@@ -120,8 +122,6 @@ def analyze_frame_jank():
 
     total_frames = cursor.fetchone()[0]
 
-    # Frames taking longer than 16ms
-    # (60 FPS threshold)
     cursor.execute("""
     SELECT COUNT(*)
     FROM events
@@ -131,7 +131,6 @@ def analyze_frame_jank():
 
     dropped_frames = cursor.fetchone()[0]
 
-    # Worst frame render times
     cursor.execute("""
     SELECT duration_ms
     FROM events
@@ -144,37 +143,117 @@ def analyze_frame_jank():
 
     conn.close()
 
-    # Jank percentage
     jank_percentage = 0
 
     if total_frames > 0:
+
         jank_percentage = (
             dropped_frames / total_frames
         ) * 100
 
     return {
+
         "total_frames": total_frames,
+
         "dropped_frames": dropped_frames,
+
         "jank_percentage": jank_percentage,
+
         "worst_frame_times": worst_frames
     }
 
 
 # =========================================================
-# COMPARATIVE ANALYSIS
+# IMPROVEMENT PERCENTAGE CALCULATOR
 # =========================================================
 
-def compare_traces(trace_a_metrics, trace_b_metrics):
+def calculate_improvement(before, after):
+
+    if before == 0:
+        return 0
+
+    improvement = (
+        (before - after) / before
+    ) * 100
+
+    return round(improvement, 2)
+
+
+# =========================================================
+# OPTIMIZATION VALIDATION ENGINE
+# =========================================================
+
+def validate_optimization(
+
+    cpu_before,
+    cpu_after,
+
+    binder_before,
+    binder_after,
+
+    frame_before,
+    frame_after
+):
+
+    cpu_improvement = calculate_improvement(
+
+        cpu_before["average_duration_ms"],
+        cpu_after["average_duration_ms"]
+    )
+
+    binder_improvement = calculate_improvement(
+
+        binder_before["average_latency_ms"],
+        binder_after["average_latency_ms"]
+    )
+
+    jank_improvement = calculate_improvement(
+
+        frame_before["jank_percentage"],
+        frame_after["jank_percentage"]
+    )
+
+    overall_score = (
+
+        cpu_improvement
+        + binder_improvement
+        + jank_improvement
+
+    ) / 3
+
+    return {
+
+        "cpu_improvement_percent":
+        cpu_improvement,
+
+        "binder_improvement_percent":
+        binder_improvement,
+
+        "jank_improvement_percent":
+        jank_improvement,
+
+        "overall_optimization_score":
+        round(overall_score, 2)
+    }
+
+
+# =========================================================
+# TRACE COMPARISON
+# =========================================================
+
+def compare_traces(trace_before, trace_after):
 
     comparison = {
 
         "cpu_difference":
-        trace_b_metrics["average_duration_ms"]
-        - trace_a_metrics["average_duration_ms"],
+
+        trace_after["average_duration_ms"]
+        - trace_before["average_duration_ms"],
 
         "binder_latency_difference":
-        trace_b_metrics["average_latency_ms"]
-        - trace_a_metrics["average_latency_ms"]
+
+        trace_after["average_latency_ms"]
+        - trace_before["average_latency_ms"]
     }
 
     return comparison

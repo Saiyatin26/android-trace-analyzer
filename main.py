@@ -28,7 +28,13 @@ from optimization_engine import (
     generate_optimization_recommendations
 )
 
+from comparison_engine import (
+    compare_device_performance
+)
+
 from ai_engine import generate_ai_insights
+
+
 # =========================================================
 # TRACE FILES
 # =========================================================
@@ -37,174 +43,200 @@ TRACE_A = "traces/trace_A.perfetto-trace"
 
 TRACE_B = "traces/trace_B.perfetto-trace"
 
+
 # =========================================================
 # DATABASE SETUP
 # =========================================================
 
 create_database()
 
-clear_events()
+
+# =========================================================
+# GENERIC TRACE PROCESSOR
+# =========================================================
+
+def process_trace(trace_file):
+
+    clear_events()
+
+    trace_data = parse_trace(trace_file)
+
+    normalized_cpu = normalize_sched_events(
+        trace_data["cpu_events"]
+    )
+
+    normalized_binder = normalize_binder_events(
+        trace_data["binder_events"]
+    )
+
+    normalized_frame = normalize_frame_events(
+        trace_data["frame_events"]
+    )
+
+    all_events = (
+        normalized_cpu
+        + normalized_binder
+        + normalized_frame
+    )
+
+    insert_events(all_events)
+
+    cpu_analysis = analyze_cpu_load()
+
+    binder_analysis = analyze_binder_calls()
+
+    frame_analysis = analyze_frame_jank()
+
+    chains = build_event_chains()
+
+    temporal_insights = (
+        generate_temporal_insights(chains)
+    )
+
+    return {
+
+        "cpu": cpu_analysis,
+
+        "binder": binder_analysis,
+
+        "frame": frame_analysis,
+
+        "temporal": temporal_insights
+    }
+
 
 # =========================================================
 # PROCESS TRACE A
 # =========================================================
 
-trace_a = parse_trace(TRACE_A)
+print("\n==============================")
+print("TRACE A ANALYSIS")
+print("==============================")
 
-normalized_cpu_a = normalize_sched_events(
-    trace_a["cpu_events"]
-)
+trace_a_results = process_trace(TRACE_A)
 
-normalized_binder_a = normalize_binder_events(
-    trace_a["binder_events"]
-)
+print("\nCPU ANALYSIS\n")
+print(trace_a_results["cpu"])
 
-normalized_frame_a = normalize_frame_events(
-    trace_a["frame_events"]
-)
+print("\nBINDER ANALYSIS\n")
+print(trace_a_results["binder"])
 
-events_a = (
-    normalized_cpu_a
-    + normalized_binder_a
-    + normalized_frame_a
-)
+print("\nFRAME ANALYSIS\n")
+print(trace_a_results["frame"])
 
-insert_events(events_a)
-
-cpu_analysis_a = analyze_cpu_load()
-
-binder_analysis_a = analyze_binder_calls()
-
-frame_analysis_a = analyze_frame_jank()
-
-print("\nTRACE A ANALYSIS\n")
-
-print(cpu_analysis_a)
-
-print(binder_analysis_a)
-
-print(frame_analysis_a)
-
-# =========================================================
-# CLEAR DB FOR TRACE B
-# =========================================================
-
-clear_events()
 
 # =========================================================
 # PROCESS TRACE B
 # =========================================================
 
-trace_b = parse_trace(TRACE_B)
+print("\n==============================")
+print("TRACE B ANALYSIS")
+print("==============================")
 
-normalized_cpu_b = normalize_sched_events(
-    trace_b["cpu_events"]
-)
+trace_b_results = process_trace(TRACE_B)
 
-normalized_binder_b = normalize_binder_events(
-    trace_b["binder_events"]
-)
+print("\nCPU ANALYSIS\n")
+print(trace_b_results["cpu"])
 
-normalized_frame_b = normalize_frame_events(
-    trace_b["frame_events"]
-)
+print("\nBINDER ANALYSIS\n")
+print(trace_b_results["binder"])
 
-events_b = (
-    normalized_cpu_b
-    + normalized_binder_b
-    + normalized_frame_b
-)
+print("\nFRAME ANALYSIS\n")
+print(trace_b_results["frame"])
 
-insert_events(events_b)
-
-cpu_analysis_b = analyze_cpu_load()
-
-binder_analysis_b = analyze_binder_calls()
-
-frame_analysis_b = analyze_frame_jank()
-
-print("\nTRACE B ANALYSIS\n")
-
-print(cpu_analysis_b)
-
-print(binder_analysis_b)
-
-print(frame_analysis_b)
 
 # =========================================================
 # COMPARATIVE ANALYSIS
 # =========================================================
 
 comparison = compare_traces(
+
     {
         "average_duration_ms":
-        cpu_analysis_a["average_duration_ms"],
+        trace_a_results["cpu"][
+            "average_duration_ms"
+        ],
 
         "average_latency_ms":
-        binder_analysis_a["average_latency_ms"]
+        trace_a_results["binder"][
+            "average_latency_ms"
+        ]
     },
 
     {
         "average_duration_ms":
-        cpu_analysis_b["average_duration_ms"],
+        trace_b_results["cpu"][
+            "average_duration_ms"
+        ],
 
         "average_latency_ms":
-        binder_analysis_b["average_latency_ms"]
+        trace_b_results["binder"][
+            "average_latency_ms"
+        ]
     }
 )
 
-print("\nCOMPARATIVE ANALYSIS\n")
+print("\n==============================")
+print("COMPARATIVE ANALYSIS")
+print("==============================")
 
 print(comparison)
+
 
 # =========================================================
 # TEMPORAL ANALYSIS
 # =========================================================
 
-chains = build_event_chains()
+print("\n==============================")
+print("TEMPORAL EVENT CHAINS")
+print("==============================")
 
-temporal_insights = generate_temporal_insights(chains)
-
-print("\nTEMPORAL EVENT CHAINS\n")
-
-for insight in temporal_insights:
+for insight in trace_b_results["temporal"]:
 
     print(insight)
-    
+
+
 # =========================================================
-# AI ROOT CAUSE ENGINE
+# AI INSIGHTS
 # =========================================================
 
 ai_insights = generate_ai_insights(
 
-    cpu_analysis_a,
-    cpu_analysis_b,
+    trace_a_results["cpu"],
+    trace_b_results["cpu"],
 
-    binder_analysis_a,
-    binder_analysis_b,
+    trace_a_results["binder"],
+    trace_b_results["binder"],
 
-    frame_analysis_a,
-    frame_analysis_b
+    trace_a_results["frame"],
+    trace_b_results["frame"]
 )
 
-print("\nAI PERFORMANCE INSIGHTS\n")
+print("\n==============================")
+print("AI PERFORMANCE INSIGHTS")
+print("==============================")
 
 for insight in ai_insights:
 
     print("-", insight)
-    
-    
+
+
 # =========================================================
-# OPTIMIZATION ENGINE
+# OPTIMIZATION RECOMMENDATIONS
 # =========================================================
 
-optimization_results = generate_optimization_recommendations(
+optimization_results = (
+    generate_optimization_recommendations(
 
-    cpu_analysis_a,
-    binder_analysis_a,
-    frame_analysis_a
+        trace_b_results["cpu"],
+        trace_b_results["binder"],
+        trace_b_results["frame"]
+    )
 )
-print("\nOPTIMIZATION RECOMMENDATIONS\n")
+
+print("\n==============================")
+print("OPTIMIZATION RECOMMENDATIONS")
+print("==============================")
 
 for recommendation in optimization_results:
 
@@ -215,6 +247,45 @@ for recommendation in optimization_results:
     print(recommendation["optimization"])
 
     print("\nExpected Improvement:")
-    print(recommendation["expected_improvement"])
+    print(recommendation[
+        "expected_improvement"
+    ])
 
     print("\n-----------------------------------")
+
+
+# =========================================================
+# FINAL DEVICE COMPARISON
+# =========================================================
+
+comparison_results = compare_device_performance(
+
+    trace_a_results["cpu"],
+    trace_b_results["cpu"],
+
+    trace_a_results["binder"],
+    trace_b_results["binder"],
+
+    trace_a_results["frame"],
+    trace_b_results["frame"]
+)
+
+print("\n==============================")
+print("FINAL DEVICE COMPARISON")
+print("==============================")
+
+print("\nTRACE A SCORE:")
+print(comparison_results["trace_a_score"])
+
+print("\nTRACE B SCORE:")
+print(comparison_results["trace_b_score"])
+
+print("\nCOMPARATIVE INSIGHTS\n")
+
+for insight in comparison_results["insights"]:
+
+    print("-", insight)
+
+print("\nFINAL RESULT\n")
+
+print(comparison_results["final_result"])

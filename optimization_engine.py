@@ -147,3 +147,120 @@ def generate_optimization_recommendations(
         })
 
     return recommendations
+
+
+# =========================================================
+# OPTIMIZATION VALIDATION REPORT
+# =========================================================
+
+def generate_validation_report(validation_results):
+
+    report = []
+
+    cpu_improvement = (
+        validation_results[
+            "cpu_improvement_percent"
+        ]
+    )
+
+    binder_improvement = (
+        validation_results[
+            "binder_improvement_percent"
+        ]
+    )
+
+    jank_improvement = (
+        validation_results[
+            "jank_improvement_percent"
+        ]
+    )
+
+    overall_score = (
+        validation_results[
+            "overall_optimization_score"
+        ]
+    )
+
+    # =====================================================
+    # CPU VALIDATION
+    # =====================================================
+
+    if cpu_improvement > 0:
+
+        report.append(
+
+            f"CPU performance improved by "
+            f"{cpu_improvement}% after optimization."
+        )
+
+    else:
+
+        report.append(
+
+            "CPU optimization did not improve performance."
+        )
+
+    # =====================================================
+    # BINDER VALIDATION
+    # =====================================================
+
+    if binder_improvement > 0:
+
+        report.append(
+
+            f"Binder latency improved by "
+            f"{binder_improvement}% after optimization."
+        )
+
+    else:
+
+        report.append(
+
+            "Binder optimization showed limited improvement."
+        )
+
+    # =====================================================
+    # JANK VALIDATION
+    # =====================================================
+
+    if jank_improvement > 0:
+
+        report.append(
+
+            f"UI jank reduced by "
+            f"{jank_improvement}% after optimization."
+        )
+
+    else:
+
+        report.append(
+
+            "No major frame rendering improvement detected."
+        )
+
+    # =====================================================
+    # OVERALL SCORE
+    # =====================================================
+
+    if overall_score > 50:
+
+        report.append(
+
+            "Overall optimization effectiveness is HIGH."
+        )
+
+    elif overall_score > 20:
+
+        report.append(
+
+            "Overall optimization effectiveness is MODERATE."
+        )
+
+    else:
+
+        report.append(
+
+            "Overall optimization effectiveness is LOW."
+        )
+
+    return report

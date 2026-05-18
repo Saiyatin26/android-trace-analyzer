@@ -1,17 +1,17 @@
 # =========================================================
-# AI ROOT CAUSE ENGINE
+# AI COMPARATIVE REASONING ENGINE
 # =========================================================
 
 def generate_ai_insights(
 
-    cpu_analysis_a,
-    cpu_analysis_b,
+    trace_a_cpu,
+    trace_b_cpu,
 
-    binder_analysis_a,
-    binder_analysis_b,
+    trace_a_binder,
+    trace_b_binder,
 
-    frame_analysis_a,
-    frame_analysis_b
+    trace_a_frame,
+    trace_b_frame
 ):
 
     insights = []
@@ -20,107 +20,158 @@ def generate_ai_insights(
     # CPU ANALYSIS
     # =====================================================
 
-    cpu_a = cpu_analysis_a["average_duration_ms"]
+    cpu_a = trace_a_cpu[
+        "average_duration_ms"
+    ]
 
-    cpu_b = cpu_analysis_b["average_duration_ms"]
+    cpu_b = trace_b_cpu[
+        "average_duration_ms"
+    ]
 
-    if cpu_b > cpu_a:
+    if cpu_a < cpu_b:
 
         insights.append(
-            "Trace B shows higher CPU contention compared to Trace A."
+
+            "Trace A shows lower CPU contention "
+            "and better scheduling efficiency."
         )
 
     else:
 
         insights.append(
-            "Trace B shows lower CPU contention compared to Trace A."
+
+            "Trace B shows lower CPU contention "
+            "and better scheduling efficiency."
         )
 
     # =====================================================
     # BINDER ANALYSIS
     # =====================================================
 
-    binder_a = binder_analysis_a["average_latency_ms"]
+    binder_a = trace_a_binder[
+        "average_latency_ms"
+    ]
 
-    binder_b = binder_analysis_b["average_latency_ms"]
+    binder_b = trace_b_binder[
+        "average_latency_ms"
+    ]
 
-    if binder_b > binder_a:
+    if binder_a < binder_b:
 
         insights.append(
-            "Trace B has increased Binder transaction latency."
+
+            "Trace A demonstrates lower Binder "
+            "transaction latency."
         )
 
     else:
 
         insights.append(
-            "Trace B has reduced Binder transaction latency."
+
+            "Trace B demonstrates lower Binder "
+            "transaction latency."
         )
 
     # =====================================================
     # FRAME / JANK ANALYSIS
     # =====================================================
 
-    jank_a = frame_analysis_a["jank_percentage"]
+    jank_a = trace_a_frame[
+        "jank_percentage"
+    ]
 
-    jank_b = frame_analysis_b["jank_percentage"]
+    jank_b = trace_b_frame[
+        "jank_percentage"
+    ]
 
-    if jank_b > jank_a:
+    if jank_a < jank_b:
 
         insights.append(
-            "Trace B shows increased UI jank and frame instability."
+
+            "Trace A provides smoother frame "
+            "rendering and lower UI jank."
         )
 
     else:
 
         insights.append(
-            "Trace B maintains stable frame rendering performance."
+
+            "Trace B provides smoother frame "
+            "rendering and lower UI jank."
         )
 
     # =====================================================
-    # ROOT CAUSE ATTRIBUTION
+    # ROOT CAUSE ANALYSIS
     # =====================================================
 
-    if (
-        binder_b > binder_a
-        and cpu_b > cpu_a
-    ):
+    if cpu_a > cpu_b and binder_a > binder_b:
 
         insights.append(
-            "Potential bottleneck detected: "
-            "CPU contention is likely contributing "
-            "to Binder transaction delays."
+
+            "CPU contention in Trace A may be "
+            "contributing to higher Binder delays."
         )
 
-    if (
-        jank_b > jank_a
-        and binder_b > binder_a
-    ):
+    if jank_a > jank_b:
 
         insights.append(
-            "Frame rendering instability may be "
-            "caused by delayed Binder transactions."
+
+            "Frame instability in Trace A may be "
+            "related to scheduling or rendering delays."
+        )
+
+    if binder_a > binder_b and jank_a > jank_b:
+
+        insights.append(
+
+            "High Binder latency in Trace A may "
+            "be impacting frame rendering performance."
         )
 
     # =====================================================
-    # FINAL SUMMARY
+    # FINAL PERFORMANCE SUMMARY
     # =====================================================
 
-    if (
-        cpu_b < cpu_a
-        and binder_b < binder_a
-        and jank_b <= jank_a
-    ):
+    score_a = 0
+    score_b = 0
+
+    if cpu_a < cpu_b:
+        score_a += 1
+    else:
+        score_b += 1
+
+    if binder_a < binder_b:
+        score_a += 1
+    else:
+        score_b += 1
+
+    if jank_a < jank_b:
+        score_a += 1
+    else:
+        score_b += 1
+
+    if score_a > score_b:
 
         insights.append(
+
+            "Overall, Trace A demonstrates "
+            "better responsiveness and system performance."
+        )
+
+    elif score_b > score_a:
+
+        insights.append(
+
             "Overall, Trace B demonstrates "
-            "better system performance and responsiveness."
+            "better responsiveness and system performance."
         )
 
     else:
 
         insights.append(
-            "Overall, Trace B demonstrates "
-            "performance degradation compared to Trace A."
+
+            "Both traces show similar "
+            "performance characteristics."
         )
 
     return insights
