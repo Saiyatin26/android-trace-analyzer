@@ -1,111 +1,268 @@
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  --bg: #0f1120;
+  --surface: #16192f;
+  --surface-strong: #1f2442;
+  --surface-soft: #212a42;
+  --text: #d8d8e6;
+  --text-muted: #9aa0ba;
+  --text-strong: #ffffff;
+  --border: rgba(255, 255, 255, 0.08);
+  --accent: #8b5cf6;
+  --accent-strong: #7c3aed;
+  --accent-soft: rgba(139, 92, 246, 0.16);
+  --shadow: 0 28px 80px rgba(0, 0, 0, 0.22);
+  --sans: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --heading: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
+  font: 16px/1.6 var(--sans);
   color: var(--text);
   background: var(--bg);
-  font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+* {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
+  background: var(--bg);
+  color: var(--text);
 }
 
 #root {
-  width: 1126px;
-  max-width: 100%;
+  min-height: 100vh;
+  width: 100%;
+  max-width: 1400px;
   margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
+  padding: 0;
 }
 
 h1,
-h2 {
+h2,
+h3,
+h4 {
+  margin: 0;
   font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+  color: var(--text-strong);
 }
 
 h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
+  font-size: clamp(2.6rem, 4vw, 4rem);
+  letter-spacing: -0.05em;
 }
+
 h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
+  font-size: clamp(1.3rem, 2vw, 1.8rem);
 }
+
 p {
   margin: 0;
+  color: var(--text-muted);
 }
 
-code,
-.counter {
-  font-family: var(--mono);
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+.dashboard {
+  width: 100%;
+  padding: 32px 24px 48px;
+}
+
+.dashboard__header {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-bottom: 32px;
+}
+
+.dashboard__eyebrow {
   display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  border-radius: 999px;
+  padding: 10px 18px;
+  color: #e9d7ff;
+  background: rgba(139, 92, 246, 0.14);
+  font-size: 0.8rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+.dashboard__subtitle {
+  max-width: 760px;
+  line-height: 1.8;
 }
+
+.dashboard__status {
+  width: 100%;
+  max-width: 860px;
+  margin-bottom: 26px;
+  padding: 18px 24px;
+  border-radius: 22px;
+  background: rgba(139, 92, 246, 0.12);
+  color: #fee2e2;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dashboard__status.error {
+  background: rgba(255, 92, 92, 0.14);
+  color: #ffb3b3;
+}
+
+.summary-cards,
+.card-grid {
+  display: grid;
+  gap: 22px;
+}
+
+.summary-cards {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  margin-bottom: 24px;
+}
+
+.summary-card,
+.card {
+  background: linear-gradient(180deg, rgba(25, 33, 58, 0.9), rgba(19, 24, 42, 0.95));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 28px;
+  padding: 28px;
+  box-shadow: var(--shadow);
+}
+
+.summary-card {
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.summary-card__label {
+  display: block;
+  margin-bottom: 14px;
+  color: var(--accent);
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.summary-card strong {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 2rem;
+  color: var(--text-strong);
+}
+
+.summary-card p {
+  color: var(--text-muted);
+}
+
+.card-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.card--wide {
+  grid-column: span 2;
+}
+
+.card {
+  position: relative;
+}
+
+.card h2 {
+  margin-bottom: 16px;
+  color: var(--text-strong);
+}
+
+.chart-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.chart-card {
+  min-height: 420px;
+}
+
+.insights-list {
+  display: grid;
+  gap: 14px;
+}
+
+.insight-card {
+  padding: 18px 20px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--text);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+
+.table th,
+.table td {
+  padding: 15px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text);
+}
+
+.table th {
+  background: rgba(139, 92, 246, 0.1);
+  color: var(--text-strong);
+}
+
+.callout {
+  margin-top: 18px;
+  padding: 18px 20px;
+  border-radius: 18px;
+  background: rgba(139, 92, 246, 0.12);
+  color: var(--text-strong);
+}
+
+.temporal-card {
+  min-height: 520px;
+}
+
+.temporal-graph-container {
+  width: 100%;
+  height: 360px;
+  margin-bottom: 18px;
+}
+
+.tooltip-box {
+  background: rgba(12, 16, 32, 0.96);
+  color: #f8fafc;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+@media (max-width: 1080px) {
+  .dashboard {
+    padding: 24px 18px 32px;
+  }
+
+  .card-grid,
+  .summary-cards,
+  .chart-row {
+    grid-template-columns: 1fr;
+  }
+
+  .card--wide {
+    grid-column: span 1;
+  }
+
+  .chart-card {
+    min-height: 340px;
+  }
+}
+
